@@ -1,0 +1,9 @@
+import torch
+
+print('PyTorch:', torch.__version__)
+print('CUDA available:', torch.cuda.is_available())
+
+if torch.cuda.is_available():
+    print('GPU:', torch.cuda.get_device_name(0))
+    props = torch.cuda.get_device_properties(0)
+    print('VRAM GB:', round(props.total_memory / 1e9, 2))

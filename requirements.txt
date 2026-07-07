@@ -1,0 +1,14 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+jupyter
+tqdm
+rich
+kaggle
+kagglehub
+torch
+torchvision
+torchaudio
+gymnasium
+stable-baselines3
