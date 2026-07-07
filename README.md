@@ -4,7 +4,7 @@ This repo is for the Kaggle Pokemon TCG AI Battle Challenge Strategy competition
 
 ## Core idea
 
-Card knowledge graph + game-state simulator + heuristic planner + lookahead planner + MCTS + future neural value model.
+Card knowledge graph + game-state simulator + heuristic planner + lookahead planner + MCTS + future neural value model. The repo is engine-agnostic Pokémofor the TCG AI framework with Twinleaf adapter + MCTS.
 
 ## Run
 
