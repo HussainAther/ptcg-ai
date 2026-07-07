@@ -1,6 +1,7 @@
 ﻿from src.knowledge.card_knowledge_graph import CardKnowledgeGraph
 from src.planner.heuristic_planner import HeuristicPlanner
 from src.planner.lookahead_planner import LookaheadPlanner
+from src.planner.mcts import MCTSPlanner
 from src.simulation.state_encoder import StateEncoder
 from src.evaluation.board_evaluator import BoardEvaluator
 
@@ -50,13 +51,15 @@ def main():
 
     print()
     print('Heuristic planner:')
-    heuristic_decision = HeuristicPlanner().choose_action(state)
-    print(heuristic_decision)
+    print(HeuristicPlanner().choose_action(state))
 
     print()
     print('Lookahead planner:')
-    lookahead_decision = LookaheadPlanner().choose_action(state)
-    print(lookahead_decision)
+    print(LookaheadPlanner().choose_action(state))
+
+    print()
+    print('MCTS planner:')
+    print(MCTSPlanner(simulations=200, rollout_depth=4).choose_action(state))
 
 
 if __name__ == '__main__':
