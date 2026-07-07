@@ -15,9 +15,9 @@ class SimpleSimulator:
             )
 
             if next_state['opp_active_hp'] == 0:
-                next_state['opp_prizes_left'] = max(
+                next_state['my_prizes_left'] = max(
                     0,
-                    next_state.get('opp_prizes_left', 6) - 1,
+                    next_state.get('my_prizes_left', 6) - 1,
                 )
 
         elif action == 'attach_energy':
