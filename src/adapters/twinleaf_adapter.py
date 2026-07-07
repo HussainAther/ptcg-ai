@@ -110,3 +110,18 @@ class TwinleafAdapter:
             return ActionType.PLAY_CARD
 
         return ActionType.PASS
+
+    def test_twinleaf_adapter_maps_play_card_action():
+        adapter = TwinleafAdapter()
+        actions = adapter.from_twinleaf_actions([
+            {
+                "type": "PLAY_CARD_ACTION",
+                "id": 1,
+                "handIndex": 2,
+                "target": {"player": 1, "slot": 3, "index": 0},
+            }
+        ])
+
+        assert actions[0].action_type == ActionType.PLAY_CARD
+        assert actions[0].payload["handIndex"] == 2
+        assert actions[0].payload["target"]["slot"] == 3
