@@ -2,6 +2,26 @@
 
 This repo is for the Kaggle Pokemon TCG AI Battle Challenge Strategy competition.
 
+## Core idea
+
+Card knowledge graph + game-state simulator + heuristic planner + lookahead planner + MCTS + future neural value model.
+
+## Run
+
+```powershell
+python -m src.run_framework_demo
+pytest
+````
+
+## Modules
+
+* `src/knowledge`: card database, strategic tags, knowledge graph
+* `src/simulation`: Pokemon/player/game state, rules, engine
+* `src/planner`: heuristic, lookahead, MCTS
+* `src/evaluation`: board evaluator
+* `src/models`: PyTorch value network skeleton
+* `docs/strategy_draft.md`: Kaggle strategy writeup
+
 ## Core Strategy
 
 Build a hybrid Pokemon TCG agent using:
