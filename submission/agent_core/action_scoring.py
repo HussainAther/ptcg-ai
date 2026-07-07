@@ -73,11 +73,6 @@ def score_option(board: BoardState, option: Any) -> int:
             score += 80
         else:
             score += 5
-
-    # Avoid passing unless forced.
-    if "pass" in text or "end" in text:
-        score -= 300
-
     return score
 
 
