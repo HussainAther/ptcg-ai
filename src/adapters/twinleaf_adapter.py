@@ -2,9 +2,10 @@
 
 from src.interfaces.game_state import NeutralGameState, PlayerView, PokemonView
 from src.interfaces.legal_action import LegalAction, ActionType
+from src.interfaces.engine import EngineAdapter
 
 
-class TwinleafAdapter:
+class TwinleafAdapter(EngineAdapter):
     '''
     Adapter boundary between Twinleaf's TypeScript rules engine and this
     Python planning framework.
@@ -13,6 +14,15 @@ class TwinleafAdapter:
     serialized Twinleaf state/actions into neutral Python objects that
     planners can evaluate.
     '''
+    def parse_state(self, raw_state):
+        return self.from_twinleaf_state(raw_state)
+
+    def parse_actions(self, raw_actions):
+        return self.from_twinleaf_actions(raw_actions)
+
+    def to_engine_action(self, action):
+        return self.to_twinleaf_action(action)
+
 
     def from_twinleaf_state(self, raw_state: Dict[str, Any]) -> NeutralGameState:
         player_raw = raw_state.get('player', {})
@@ -84,33 +94,25 @@ class TwinleafAdapter:
 
     def _map_action_type(self, label: str) -> ActionType:
         text = label.lower()
-        
-        if 'ATTACK_ACTION'.lower() in text:
-            return ActionType.ATTACK
-        if 'RETREAT_ACTION'.lower() in text or 'RETREAT_START_ACTION'.lower() in text:
-            return ActionType.RETREAT
-        if 'PASS_TURN'.lower() in text:
-            return ActionType.END_TURN
-        if 'USE_ABILITY_ACTION'.lower() in text:
-            return ActionType.USE_ABILITY
 
-        if 'attack' in text:
+        if 'play_card_action' in text:
+            return ActionType.PLAY_CARD
+        if 'attack_action' in text or 'attack' in text:
             return ActionType.ATTACK
-        if 'retreat' in text:
+        if 'retreat_action' in text or 'retreat_start_action' in text or 'retreat' in text:
             return ActionType.RETREAT
+        if 'pass_turn' in text or 'end' in text:
+            return ActionType.END_TURN
+        if 'use_ability_action' in text or 'ability' in text:
+            return ActionType.USE_ABILITY
         if 'energy' in text or 'attach' in text:
             return ActionType.ATTACH_ENERGY
         if 'evolve' in text:
             return ActionType.EVOLVE
-        if 'ability' in text:
-            return ActionType.USE_ABILITY
-        if 'end' in text:
-            return ActionType.END_TURN
         if 'play' in text:
             return ActionType.PLAY_CARD
 
         return ActionType.PASS
-
     def test_twinleaf_adapter_maps_play_card_action():
         adapter = TwinleafAdapter()
         actions = adapter.from_twinleaf_actions([
