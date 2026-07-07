@@ -5,6 +5,10 @@ from cg.api import Observation, to_observation_class
 
 import json
 
+from agent_core.board import parse_board
+from agent_core.action_scoring import choose_indices
+from agent_core.debug_logger import log_turn
+
 
 
 def read_deck_csv() -> list[int]:
@@ -58,6 +62,8 @@ def agent(obs_dict: dict) -> list[int]:
             score += 40
         if "draw" in text or "search" in text:
             score += 35
+        if "ability" in text:
+            score += 25
         if "evolve" in text:
             score += 30
         if "retreat" in text:
@@ -70,4 +76,13 @@ def agent(obs_dict: dict) -> list[int]:
     scores.sort(reverse=True)
 
     count = obs.select.maxCount
-    return [i for _, i in scores[:count]]
+    board = parse_board(obs_dict)
+    selected = choose_indices(
+        board=board,
+        options=list(obs.select.option),
+        min_count=obs.select.minCount,
+        max_count=obs.select.maxCount,
+    )
+
+    log_turn(obs_dict, selected)
+    return selected
