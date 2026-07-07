@@ -1,46 +1,192 @@
-# PTCG AI Battle Strategy
+# PTCG AI
+### Engine-Agnostic Pokémon TCG AI Research Framework
 
-This repo is for the Kaggle Pokemon TCG AI Battle Challenge Strategy competition.
+A research framework for developing competitive AI agents for the Pokémon Trading Card Game.
 
-## Core idea
+Originally created for the **Kaggle Pokémon TCG AI Battle Challenge Strategy** competition, this project has evolved into a modular architecture for game AI research. The framework separates **game rules** from **decision making**, allowing planners and learning algorithms to work with different Pokémon TCG engines through adapter interfaces.
 
-Card knowledge graph + game-state simulator + heuristic planner + lookahead planner + MCTS + future neural value model.
+---
 
-## Run
+# Project Goals
 
-```powershell
+Build a competitive Pokémon TCG AI by combining:
+
+- Knowledge-based reasoning
+- Heuristic planning
+- Monte Carlo Tree Search (MCTS)
+- Learned value networks
+- Engine-independent state representations
+
+The long-term goal is to support multiple Pokémon TCG simulators without changing the AI algorithms.
+
+---
+
+# Architecture
+
+```
+                Pokémon TCG Engine
+             (Twinleaf / Future Engines)
+                       │
+                       ▼
+              Serialized Game State
+                       │
+                       ▼
+                Twinleaf Adapter
+                       │
+                       ▼
+              NeutralGameState
+              + LegalAction API
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+   Heuristic      Lookahead        MCTS
+    Planner        Planner         Search
+        └──────────────┼──────────────┘
+                       ▼
+                Value Network
+                 (future work)
+                       ▼
+               Selected Legal Action
+                       ▼
+                Engine Action Payload
+                       ▼
+                Rules Engine Executes
+```
+
+The engine remains the **rules authority** while the Python framework focuses entirely on planning and learning.
+
+---
+
+# Current Features
+
+## Knowledge Layer
+
+- Card database
+- Strategic keyword mining
+- Card tagging
+- Card knowledge graph
+
+## Simulation
+
+- Neutral game-state representation
+- Player/Pokémon abstractions
+- State encoder
+- Lightweight simulator
+
+## Planning
+
+- Heuristic planner
+- Lookahead planner
+- Neutral action planner
+- Modular planning interfaces
+
+## Evaluation
+
+- Board evaluator
+- Prize race evaluation
+- Board development heuristics
+
+## Engine Integration
+
+- Engine adapter interface
+- Twinleaf adapter prototype
+- Neutral action abstraction
+- Twinleaf-compatible action payload generation
+
+---
+
+# Repository Structure
+
+```
+src/
+    adapters/
+    evaluation/
+    interfaces/
+    knowledge/
+    planner/
+    simulation/
+    utils/
+
+tests/
+docs/
+fixtures/
+outputs/
+```
+
+---
+
+# Running
+
+Run the demonstration:
+
+```bash
 python -m src.run_framework_demo
+```
+
+Run the Twinleaf adapter prototype:
+
+```bash
+python -m src.adapters.run_twinleaf_adapter_demo
+```
+
+Run all tests:
+
+```bash
 pytest
-````
+```
 
-## Modules
+---
 
-* `src/knowledge`: card database, strategic tags, knowledge graph
-* `src/simulation`: Pokemon/player/game state, rules, engine
-* `src/planner`: heuristic, lookahead, MCTS
-* `src/evaluation`: board evaluator
-* `src/models`: PyTorch value network skeleton
-* `docs/strategy_draft.md`: Kaggle strategy writeup
+# Design Philosophy
 
-## Core Strategy
+Instead of implementing thousands of Pokémon card rules in Python, this project treats an external simulator (currently Twinleaf) as the **rules engine**.
 
-Build a hybrid Pokemon TCG agent using:
+The AI operates only on:
 
-1. Rule-safe heuristic policy
-2. Game-state featurization
-3. Monte Carlo rollout search
-4. Learned value estimation
-5. Opponent/deck archetype belief tracking
+- game state
+- legal actions
+- action outcomes
 
-## Why this makes sense
+This separation allows planners and future neural models to remain independent of any specific simulator.
 
-Pokemon TCG involves hidden information, stochastic draws, branching tactical choices, and long-horizon planning. A strong agent should combine fast heuristics with simulation and learned evaluation.
+---
 
-## Current Files
+# Roadmap
 
-- src/check_gpu.py: verifies CUDA/GPU
-- src/strategy_skeleton.py: starter heuristic agent
-- notebooks/: exploration notebooks
-- data/: local datasets, ignored by git
-- models/: saved models, ignored by git
-- outputs/: generated results, ignored by git
+## Near Term
+
+- Improve board evaluation
+- Stronger heuristic planner
+- Full MCTS implementation
+- Richer state encoding
+- Better card synergy modeling
+
+## Mid Term
+
+- Self-play framework
+- Neural value network (PyTorch)
+- Policy learning
+- Deck archetype recognition
+- Opponent belief modeling
+
+## Long Term
+
+- Twinleaf live integration
+- Engine-independent AI interface
+- Reinforcement learning
+- Large-scale self-play training
+- Competitive Pokémon TCG agent
+
+---
+
+# Competition
+
+Built for:
+
+**Kaggle — Pokémon TCG AI Battle Challenge Strategy**
+
+---
+
+# License
+
+MIT License
