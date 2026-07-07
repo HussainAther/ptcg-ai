@@ -1,26 +1,24 @@
-﻿from card_database import CardDatabase
-from card_tags import infer_tags
-from planner import HeuristicPlanner
-from state_encoder import StateEncoder
+﻿from src.knowledge.card_knowledge_graph import CardKnowledgeGraph
+from src.planner.heuristic_planner import HeuristicPlanner
+from src.planner.lookahead_planner import LookaheadPlanner
+from src.simulation.state_encoder import StateEncoder
+from src.evaluation.board_evaluator import BoardEvaluator
 
 
 def main():
-    db = CardDatabase()
-    df = db.to_dataframe()
-    df['tags'] = df['effect'].apply(infer_tags)
+    kg = CardKnowledgeGraph()
 
-    print('Loaded cards:', len(df))
-    print('Cards with strategic tags:', int(df['tags'].apply(len).gt(0).sum()))
+    print('Knowledge graph loaded.')
+    print('Unique strategic tags:', len(kg.tag_counts()))
+    print()
 
-    tag_counts = {}
-    for tags in df['tags']:
-        for tag in tags:
-            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+    print('Top strategic tags:')
+    for tag, count in sorted(kg.tag_counts().items(), key=lambda x: x[1], reverse=True):
+        print(tag, count)
 
     print()
-    print('Top tags:')
-    for tag, count in sorted(tag_counts.items(), key=lambda x: x[1], reverse=True):
-        print(tag, count)
+    print('Example card summary:')
+    print(kg.card_summary('Greninja ex'))
 
     state = {
         'my_prizes_left': 5,
@@ -32,6 +30,7 @@ def main():
         'my_bench': ['Basic A', 'Basic B'],
         'opp_bench': ['Basic C'],
         'turn_number': 4,
+        'attack_damage': 60,
         'can_attack': True,
         'can_attach_energy': True,
         'can_play_supporter': True,
@@ -40,14 +39,24 @@ def main():
 
     encoded = StateEncoder().encode(state)
     print()
-    print('Encoded state:', dict(zip(encoded.feature_names, encoded.vector)))
+    print('Encoded state:')
+    print(dict(zip(encoded.feature_names, encoded.vector)))
 
-    planner = HeuristicPlanner()
-    decision = planner.choose_action(state)
     print()
-    print('Chosen action:', decision.action)
-    print('Score:', decision.score)
-    print('Reason:', decision.reason)
+    print('Board evaluation:')
+    board_eval = BoardEvaluator().evaluate(state)
+    print('score:', board_eval.score)
+    print('components:', board_eval.components)
+
+    print()
+    print('Heuristic planner:')
+    heuristic_decision = HeuristicPlanner().choose_action(state)
+    print(heuristic_decision)
+
+    print()
+    print('Lookahead planner:')
+    lookahead_decision = LookaheadPlanner().choose_action(state)
+    print(lookahead_decision)
 
 
 if __name__ == '__main__':

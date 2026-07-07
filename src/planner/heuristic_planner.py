@@ -1,6 +1,6 @@
 ﻿from typing import Any, Dict
-from action_generator import ActionGenerator
-from action_evaluator import ActionEvaluator
+from src.planner.action_generator import ActionGenerator
+from src.planner.action_evaluator import ActionEvaluator
 
 
 class HeuristicPlanner:
