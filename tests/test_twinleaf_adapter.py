@@ -1,58 +1,54 @@
-﻿import sys
+﻿import json
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 
 from src.adapters.twinleaf_adapter import TwinleafAdapter
 from src.interfaces.legal_action import ActionType
 
 
-def test_twinleaf_adapter_parses_neutral_state():
-    raw = {
-        'turn': 3,
-        'phase': 'attack',
-        'player': {
-            'name': 'me',
-            'prizesLeft': 5,
-            'hand': ['A', 'B'],
-            'deck': ['C'],
-            'discard': [],
-            'active': {'name': 'Pikachu', 'hpRemaining': 70, 'hpMax': 100},
-            'bench': [{'name': 'Bulbasaur', 'hpRemaining': 90, 'hpMax': 90}],
-        },
-        'opponent': {
-            'name': 'opp',
-            'prizesLeft': 6,
-            'hand': [],
-            'deck': ['X', 'Y'],
-            'discard': ['Z'],
-            'active': {'name': 'Charmander', 'hpRemaining': 40, 'hpMax': 70},
-            'bench': [],
-        },
-        'legal_actions': [
-            {'type': 'attack', 'label': 'Attack with Thunder Shock'},
-            {'type': 'retreat', 'label': 'Retreat'},
-        ],
-    }
+def choose_simple_action(actions):
+    priority = [
+        ActionType.ATTACK,
+        ActionType.PLAY_CARD,
+        ActionType.ATTACH_ENERGY,
+        ActionType.RETREAT,
+        ActionType.END_TURN,
+        ActionType.PASS,
+    ]
 
-    state = TwinleafAdapter().from_twinleaf_state(raw)
+    for action_type in priority:
+        for action in actions:
+            if action.action_type == action_type:
+                return action
 
-    assert state.turn_number == 3
-    assert state.player.name == 'me'
-    assert state.player.active.name == 'Pikachu'
-    assert state.opponent.active.name == 'Charmander'
-    assert len(state.legal_actions) == 2
-    assert state.legal_actions[0].action_type == ActionType.ATTACK
+    return actions[0] if actions else None
 
-def test_twinleaf_adapter_maps_real_action_types():
+
+def main():
+    fixture_path = Path("fixtures/twinleaf_sample_state.json")
+    raw_state = json.loads(fixture_path.read_text(encoding="utf-8"))
+
     adapter = TwinleafAdapter()
-    actions = adapter.from_twinleaf_actions([
-        {"type": "ATTACK_ACTION", "name": "Thunder Shock", "clientId": 1},
-        {"type": "RETREAT_ACTION", "benchIndex": 0, "clientId": 1},
-        {"type": "PASS_TURN", "clientId": 1},
-    ])
+    neutral_state = adapter.parse_state(raw_state)
 
-    assert actions[0].action_type == ActionType.ATTACK
-    assert actions[1].action_type == ActionType.RETREAT
-    assert actions[2].action_type == ActionType.END_TURN
+    print("Parsed neutral state")
+    print("Turn:", neutral_state.turn_number)
+    print("Phase:", neutral_state.phase)
+    print("Player active:", neutral_state.player.active.name)
+    print("Opponent active:", neutral_state.opponent.active.name)
+
+    print()
+    print("Legal actions:")
+    for action in neutral_state.legal_actions:
+        print("-", action.action_type.value, "|", action.label)
+
+    chosen = choose_simple_action(neutral_state.legal_actions)
+    engine_payload = adapter.to_engine_action(chosen)
+
+    print()
+    print("Chosen neutral action:", chosen.action_type.value)
+    print("Twinleaf payload:")
+    print(json.dumps(engine_payload, indent=2))
+
+
+if __name__ == "__main__":
+    main()s

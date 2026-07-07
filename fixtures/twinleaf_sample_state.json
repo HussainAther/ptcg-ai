@@ -1,0 +1,56 @@
+{
+  "turn": 4,
+  "phase": "player_turn",
+  "player": {
+    "name": "me",
+    "prizesLeft": 5,
+    "hand": ["Energy", "Nest Ball", "Supporter"],
+    "deck": ["Card A", "Card B"],
+    "discard": [],
+    "active": {
+      "name": "Greninja ex",
+      "hpRemaining": 180,
+      "hpMax": 310
+    },
+    "bench": []
+  },
+  "opponent": {
+    "name": "opp",
+    "prizesLeft": 6,
+    "hand": [],
+    "deck": [],
+    "discard": [],
+    "active": {
+      "name": "Charmander",
+      "hpRemaining": 50,
+      "hpMax": 70
+    },
+    "bench": []
+  },
+  "legal_actions": [
+    {
+      "type": "ATTACK_ACTION",
+      "clientId": 1,
+      "name": "Water Shuriken"
+    },
+    {
+      "type": "PLAY_CARD_ACTION",
+      "id": 1,
+      "handIndex": 0,
+      "target": {
+        "player": 1,
+        "slot": 3,
+        "index": 0
+      }
+    },
+    {
+      "type": "RETREAT_ACTION",
+      "clientId": 1,
+      "benchIndex": 0
+    },
+    {
+      "type": "PASS_TURN",
+      "clientId": 1
+    }
+  ]
+}
