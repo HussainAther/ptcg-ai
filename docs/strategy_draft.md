@@ -66,6 +66,14 @@ Pokemon in play track HP, attached energy, status conditions, evolution status, 
 
 The state encoder converts board state into features such as prize count, active HP, hand size, bench size, estimated opponent hand size, and turn number. This supports both heuristic planning and future neural value models.
 
+## Engine-Agnostic Adapter Prototype
+
+The framework now includes a neutral adapter layer. A Twinleaf-like serialized state is converted into `NeutralGameState`, legal engine actions are converted into `LegalAction`, the planner chooses an action, and the adapter returns the original Twinleaf-compatible payload.
+
+This proves the intended architecture:
+
+Twinleaf rules engine -> adapter -> neutral planner -> selected Twinleaf action
+
 ## Action Generation
 
 The action generator enumerates legal candidate actions such as:
