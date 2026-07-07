@@ -44,3 +44,15 @@ def test_twinleaf_adapter_parses_neutral_state():
     assert state.opponent.active.name == 'Charmander'
     assert len(state.legal_actions) == 2
     assert state.legal_actions[0].action_type == ActionType.ATTACK
+
+def test_twinleaf_adapter_maps_real_action_types():
+    adapter = TwinleafAdapter()
+    actions = adapter.from_twinleaf_actions([
+        {"type": "ATTACK_ACTION", "name": "Thunder Shock", "clientId": 1},
+        {"type": "RETREAT_ACTION", "benchIndex": 0, "clientId": 1},
+        {"type": "PASS_TURN", "clientId": 1},
+    ])
+
+    assert actions[0].action_type == ActionType.ATTACK
+    assert actions[1].action_type == ActionType.RETREAT
+    assert actions[2].action_type == ActionType.END_TURN

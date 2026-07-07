@@ -84,6 +84,15 @@ class TwinleafAdapter:
 
     def _map_action_type(self, label: str) -> ActionType:
         text = label.lower()
+        
+        if 'ATTACK_ACTION'.lower() in text:
+            return ActionType.ATTACK
+        if 'RETREAT_ACTION'.lower() in text or 'RETREAT_START_ACTION'.lower() in text:
+            return ActionType.RETREAT
+        if 'PASS_TURN'.lower() in text:
+            return ActionType.END_TURN
+        if 'USE_ABILITY_ACTION'.lower() in text:
+            return ActionType.USE_ABILITY
 
         if 'attack' in text:
             return ActionType.ATTACK
