@@ -18,6 +18,8 @@ class PlayerBoard:
     deck_count: int = 0
     prize_count: int = 0
     discard_count: int = 0
+    hand: list[dict] = field(default_factory=list)
+    bench: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -54,6 +56,8 @@ def _parse_player(player: dict[str, Any]) -> PlayerBoard:
         deck_count=int(player.get("deckCount", 0) or 0),
         prize_count=len(player.get("prize") or []),
         discard_count=len(player.get("discard") or []),
+        hand=list(player.get("hand") or []),
+        bench=list(player.get("bench") or []),
     )
 
 

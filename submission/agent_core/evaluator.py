@@ -10,21 +10,24 @@ class ActionEvaluator:
         context = board.select_context.lower()
 
         if "setupactivepokemon" in context:
-            return self._score_setup_active(action)
+            return self._score_setup_active(board, action)
 
         if "setupbenchpokemon" in context:
-            return 700
+            return self._score_card_choice(board, action)
 
         if "drawcount" in context and action.number is not None:
-            return action.number * 500
+            return action.number * 10000
+
+        if "count" in board.select_type.lower() and action.number is not None:
+            return action.number * 1000
 
         if action.kind == "attack":
             score += 100
-            if features.opp_active_hp <= 90 and features.opp_active_hp > 0:
+            if 0 < features.opp_active_hp <= 90:
                 score += 500
-            elif features.opp_active_hp <= 120 and features.opp_active_hp > 0:
+            elif 0 < features.opp_active_hp <= 120:
                 score += 300
-            elif features.opp_active_hp <= 180 and features.opp_active_hp > 0:
+            elif 0 < features.opp_active_hp <= 180:
                 score += 150
 
         elif action.kind == "attach_energy":
@@ -40,7 +43,7 @@ class ActionEvaluator:
             score += 80
 
         elif action.kind == "retreat":
-            if features.my_active_hp <= 40 and features.my_active_hp > 0:
+            if 0 < features.my_active_hp <= 40:
                 score += 90
             else:
                 score += 5
@@ -54,31 +57,80 @@ class ActionEvaluator:
         elif action.kind == "number":
             score += (action.number or 0) * 100
 
+        elif action.kind == "yes":
+            if "isfirst" in context:
+                score -= 50
+            else:
+                score += 100
+
+        elif action.kind == "no":
+            if "isfirst" in context:
+                score += 50
+            else:
+                score -= 20
+
         return score
 
-    def _score_setup_active(self, action: StructuredAction) -> int:
-        text = action.text
-        if "kyogre" in text:
-            return 1000
-        if "snover" in text:
-            return 800
-        if "mega" in text:
-            return 100
-        return 300
+    def _score_setup_active(self, board: BoardState, action: StructuredAction) -> int:
+        name = self._card_name_from_action(board, action)
+
+        if "kyogre" in name:
+            return 1200
+        if "snover" in name:
+            return 900
+        if "mega abomasnow" in name:
+            return -1000
+        if "energy" in name:
+            return -500
+
+        return 100
 
     def _score_card_choice(self, board: BoardState, action: StructuredAction) -> int:
         context = board.select_context.lower()
+        name = self._card_name_from_action(board, action)
 
         if "setupbenchpokemon" in context:
-            return 700
+            if "kyogre" in name:
+                return 1000
+            if "snover" in name:
+                return 900
+            if "energy" in name:
+                return -500
+            if "mega abomasnow" in name:
+                return -800
+            return 300
+
+        if "kyogre" in name:
+            return 300
+        if "snover" in name:
+            return 200
+        if "mega abomasnow" in name:
+            return 120
+        if "energy" in name:
+            return 80
 
         if board.me.bench_count < 3:
             return 80
 
         return 20
 
+    def _card_name_from_action(
+        self, board: BoardState, action: StructuredAction
+    ) -> str:
+        if action.card_name:
+            return action.card_name
 
-def choose_best_indices(board: BoardState, options, min_count: int, max_count: int) -> list[int]:
+        if action.area == 2 and action.target_index is not None:
+            hand = board.me.hand
+            if 0 <= action.target_index < len(hand):
+                return str(hand[action.target_index].get("name", "")).lower()
+
+        return action.text
+
+
+def choose_best_indices(
+    board: BoardState, options, min_count: int, max_count: int
+) -> list[int]:
     from agent_core.structured_actions import parse_actions
 
     actions = parse_actions(list(options))

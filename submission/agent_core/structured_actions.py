@@ -39,6 +39,10 @@ def parse_action(index: int, option: Any) -> StructuredAction:
         elif option_type in {"no", "2"}:
             action.kind = "no"
 
+        name = str(option.get("name", "")).lower()
+        if name:
+            action.card_name = name
+
     if "attack" in text:
         action.kind = "attack"
     elif "retreat" in text:
@@ -53,7 +57,6 @@ def parse_action(index: int, option: Any) -> StructuredAction:
         action.kind = "pass"
 
     return action
-
 
 def parse_actions(options: list[Any]) -> list[StructuredAction]:
     return [parse_action(i, option) for i, option in enumerate(options)]
