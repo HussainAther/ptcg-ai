@@ -30,7 +30,7 @@ def parse_action(index: int, option: Any) -> StructuredAction:
         action.area = option.get("area")
         action.target_index = option.get("index")
 
-        if option_type in {"card", "3"}:
+        if option_type in {"card", "3", "7"}:
             action.kind = "card"
         elif option_type in {"number", "0"}:
             action.kind = "number"
@@ -38,6 +38,12 @@ def parse_action(index: int, option: Any) -> StructuredAction:
             action.kind = "yes"
         elif option_type in {"no", "2"}:
             action.kind = "no"
+        elif option_type in {"8"}:
+            action.kind = "attach_energy"
+        elif option_type in {"9"}:
+            action.kind = "evolve"
+        elif option_type in {"14"}:
+            action.kind = "pass"
 
         name = str(option.get("name", "")).lower()
         if name:
